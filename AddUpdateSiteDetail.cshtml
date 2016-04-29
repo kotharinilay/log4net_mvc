@@ -1,0 +1,661 @@
+﻿
+@{
+    Layout = null;
+}
+@model JMBReport.ViewModels.SiteDetailViewModel
+<style>
+    select.selectpicker.select-btn {
+        display: block !important;
+    }
+
+    .checkbox input[type=checkbox] {
+        display: block !important;
+        width: 1em !important;
+        margin-top: -7px !important;
+    }
+</style>
+<link href="~/Content/css/bootstrap-multiselect.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-multiselect.js"></script>
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header modal-add">
+            <h3>
+                Add <button class="close" aria-hidden="true" data-dismiss="modal" type="button">
+                    <a href="#">
+                        <img src="~/content/images/close.png">
+                    </a>
+                </button>
+            </h3>
+        </div>
+        @{
+            var action = "";
+            if (ViewBag.Action == "addSiteDetail")
+            {
+                action = "AddSiteDetail";
+            }
+            else if (ViewBag.Action == "editSiteDetail")
+            {
+                action = "EditSiteDetail";
+
+            }
+        }
+
+        @using (Html.BeginForm(action, "Hazmat", FormMethod.Post, new { id = "frmSiteDetail", role = "form" }))
+        {
+            <div class="modal-reg">
+                
+                <div class="col-md-6 col-sm-6 co-xs-12">
+
+                    <div class="form-group rpt-number">
+                        <label class="control-label">Level</label>
+                        @Html.TextBoxFor(m => m.Level, new {placeholder = "Level"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Location</label>
+                        @Html.TextBoxFor(m => m.Location, new {placeholder = "Location"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Hazard</label>
+                        @Html.DropDownListFor(m => m.HazardId, Model.HazardList, "Select", new {@class = "selectpicker select-btn", id = "ddlHazard"})
+                        <span class="hazrad-valid" style="color: red; display: none">Please select Hazard</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Material</label>
+                        @Html.DropDownListFor(m => m.MaterialId, Model.MateriaList, "Select Material", new {@class = "selectpicker select-btn", id = "ddlMaterial"})
+                        <span class="material-valid" style="color: red; display: none">Please select Material</span>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Sample Id</label>
+                        @Html.TextBoxFor(m => m.SampleId, new {placeholder = "Sample Id", @readonly = "readonly"})
+                        <span class="sampleId-valid" style="color: red; display: none">Please select Sample Id</span>
+                    </div>
+
+                    <div class="form-group rpt-number">
+                        <label class="control-label">Sample Date</label>
+                        @Html.TextBoxFor(m => m.SampleDate, "{0:dd/MM/yyyy}", new {@readonly = "readonly"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">M2</label>
+                        @Html.TextBoxFor(m => m.M2, new {placeholder = "Enter M2 Details"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label type">Type</label>
+                        @Html.DropDownListFor(m => m.TypeId, Model.TypeList, "Select Type", new {@class = "selectpicker select-btn", id = "ddlType"})
+                        <span class="type-valid" style="color: red; display: none">Please select Type</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label ">Condition</label>
+                        @Html.DropDownListFor(m => m.Condition, new List<SelectListItem>()
+                        {
+                            new SelectListItem {Text = "Good", Value = "Good"},
+                            new SelectListItem {Text = "Fair", Value = "Fair"},
+                            new SelectListItem {Text = "Poor", Value = "Poor"}
+                        }, "Select Condition", new {@class = "selectpicker select-btn condition"})
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-sm-6 col-xs-12">
+
+                    <div class="form-group rpt-number">
+                        <label class="control-label ">Risk of Exposure</label>
+                        @Html.DropDownListFor(m => m.RiskOfExposure, new List<SelectListItem>()
+                        {
+                            new SelectListItem {Text = "N/A", Value = "N/A"},
+                            new SelectListItem {Text = "Very low", Value = "Very low"},
+                            new SelectListItem {Text = "Low", Value = "Low"},
+                            new SelectListItem {Text = "Moderate", Value = "Moderate"},
+                            new SelectListItem {Text = "Very high", Value = "Very high"},
+                        }, "Select Risk of Exposure", new {@class = "selectpicker select-btn risk-of-exposure"})
+                    </div>
+
+                    <div class="form-group result-group ">
+                        <label class="control-label">Result</label>
+                        <select class="selectpicker select-btn result" id="ddlResult" multiple="multiple"></select>
+                        <input hidden id="txtResult" placeholder="Result in %"/>
+
+                    </div>
+                    @Html.HiddenFor(m => m.Result)
+
+                    <div class="form-group">
+                        <label class="control-label">Overall Risk</label>
+                        @Html.DropDownListFor(m => m.OverallRisk, new List<SelectListItem>()
+                        {
+                            new SelectListItem {Text = "N/A", Value = "N/A"},
+                            new SelectListItem {Text = "Very low", Value = "Very low"},
+                            new SelectListItem {Text = "Low", Value = "Low"},
+                            new SelectListItem {Text = "Moderate", Value = "Moderate"},
+                            new SelectListItem {Text = "High", Value = "High"},
+                            new SelectListItem {Text = "Very high", Value = "Very high"},
+                        }, "Select Overall Risk", new {@class = "selectpicker select-btn overall-risk"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Actions</label>
+                        <select class="selectpicker select-btn" id="ddlAction" multiple="multiple"></select>
+
+                        @Html.HiddenFor(m => m.Action)
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Action Timeframe</label>
+                        @Html.DropDownListFor(m => m.ActionTimeframe, new List<SelectListItem>()
+                        {
+                            new SelectListItem {Text = "N/A", Value = "N/A"},
+                            new SelectListItem {Text = "ASAP", Value = "ASAP"},
+                            new SelectListItem {Text = "Within 3 months from sample date", Value = "Within 3 months from sample date"},
+                            new SelectListItem {Text = "3- 6 months from sample date", Value = "3- 6 months from sample date"},
+                            new SelectListItem {Text = "Within the next 12 months", Value = "Within the next 12 months"},
+                            new SelectListItem {Text = "Prior to refurbishment or demolition", Value = "Prior to refurbishment or demolition"},
+                        }, "Select Action Timeframe", new {@class = "selectpicker select-btn action-timeframe"})
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Other Comments</label>
+                        @Html.TextBoxFor(m => m.Comments, new {placeholder = "Comments"})
+                    </div>
+
+                    <div class="form-group file-group">
+                        <label class="control-label">Site Detail Photo<span></span></label>
+                        <input type="file" name="file" id="sited-detail-photo" class="filestyle" data-buttonName="btn-primary" accept="image/x-png, image/jpg, image/jpeg">
+                        <span class="field-validation-valid" id="type-validation" style="display: none; color: red">
+                            Please upload files with .jpg, .jpeg, and .png extension.
+                        </span>
+                    </div>
+                    @Html.HiddenFor(m => m.Photo)
+
+                    <div class="form-group file-group">
+                        <label class="control-label">Plan Photo<span></span></label>
+                        <input type="file" name="file" id="plan-photo" class="filestyle" data-buttonName="btn-primary" accept="image/x-png, image/jpg, image/jpeg">
+                        <span class="field-validation-valid" id="type-validation" style="display: none; color: red">
+                            Please upload files with .jpg, .jpeg, and .png extension.
+                        </span>
+                    </div>
+                    @Html.HiddenFor(m => m.Plan)
+
+                </div>
+
+                <div class="col-md-12 col-xs-12">
+                    <div class="border-cls"></div>
+                </div>
+
+                <div class="col-md-12 col-xs-12">
+
+                    <div class="all-btn">
+                        @if (action == "AddSiteDetail")
+                        {
+                            <button class="btn btn-default save-btn" data-target=".bs-example-modal-lg" id="save-btn" data-toggle="modal" type="button">Save</button>
+                        }
+                        else if (action == "EditSiteDetail")
+                        {
+                            <button class="btn btn-default save-btn" data-target=".bs-example-modal-lg" id="save-btn" data-toggle="modal" type="button">Update</button>
+                        }
+                        <button class="btn btn-default cancel-btn" data-target=".bs-example-modal-lg" data-toggle="modal" id="close-modal" type="button">Cancel</button>
+                    </div>
+
+                </div>
+                @Html.HiddenFor(m => m.Photo)
+
+            </div>
+            @Html.HiddenFor(m => m.SiteId, new { @class = "site-id" })
+            @Html.HiddenFor(m => m.SiteDetailId)
+            <input type="hidden" id="sited-detail-photo-path" value="@ViewBag.SiteDetailPhotoPath" />
+        }
+        <input type="hidden" value="@ViewBag.Action" id="action" />
+
+    </div>
+</div>
+@*</div>*@
+<script>
+    $(":file").filestyle({ buttonName: "btn-primary" });
+</script>
+<script>
+    
+    var selectedHazard = "";
+    $(document).ready(function () {
+        $("#ddlResult").multiselect(
+        {
+            buttonWidth: '400px',
+            disableIfEmpty: true,
+            buttonText: function (options, select) {
+                if (select.find('option').length === 0) {
+                    return 'Please Select Hazard';
+                } else if (select.find('option:selected').length < 1) {
+                    return 'None Selected';
+                }
+                else {
+                    var selected = "";
+                    if (options.length > 2) {
+                        selected = options.length + " Selected";
+                        return selected;
+                    }
+                    else {
+                        options.each(function () {
+                            var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).html();
+                            selected += label + ', ';
+                        });
+                    }
+                    return selected.substr(0, selected.length - 2);
+                }
+            }
+        });
+        $("#ddlAction").multiselect(
+        {
+            buttonWidth: '400px',
+            disableIfEmpty: true,
+            buttonText: function (options, select) {
+                if (select.find('option').length === 0) {
+                    return 'Please Select Hazard';
+                } else if (select.find('option:selected').length < 1) {
+                    return 'None Selected';
+                }
+                else {
+                    var selected = "";
+                    if (options.length > 2) {
+                        selected = options.length + " Selected";
+                        return selected;
+                    }
+                    else {
+                        options.each(function () {
+                            var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).html();
+                            selected += label + ', ';
+                        });
+                    }
+                    return selected.substr(0, selected.length - 2);
+                }
+            }
+        });
+        $('#ddlResult').attr('style', 'display:none !important');
+        $('#ddlAction').attr('style', 'display:none !important');
+        if (!($("#ddlHazard").val().length)) {
+            $("#ddlMaterial option:first").text('Please Select Hazard First');
+            $("#ddlMaterial").attr('disabled', 'disabled');
+            $("#ddlType option:first").text('Please Select Hazard First');
+            $("#ddlType").attr('disabled', 'disabled');
+        }
+        if ($("#action").val() === "editSiteDetail") {
+            hazardId = $("#ddlHazard").val();
+            $.ajax({
+                url: "/Hazmat/GetDropDown",
+                type: "GET",
+                data: { hazardId: hazardId },
+                success: function (result) {
+                    if (result.ok) {
+                        var res = result.result.result;
+                        var action = result.result.action;
+                        var option = "";
+                        option = "";
+                        $.each(action, function (obj, val) {
+                            option += "<option value=" + val.ActionId + ">" + val.Name + "</option>";
+                        });
+                        $("#ddlAction").html(option);
+                        $("#ddlAction").attr('style', 'display:none !important');
+
+                        var selectedAction = $("#Action").val().split(',');
+                        for (var i = 0; i < selectedAction.length; i++) {
+                            $("#ddlAction").find('option[value="' + selectedAction[i] + '"]').prop("selected", true);
+                            $("input[value=" + selectedAction[i] + "]").prop('checked', 'checked');
+                        }
+                        $("#ddlAction").multiselect('rebuild');
+                        if ($("#ddlHazard").find('option:selected').text() == "ASBESTOS") {
+                            option = "";
+                            $.each(res, function (obj, val) {
+                                option += "<option value=" + val.ResultId + ">" + val.Name + "</option>";
+                            });
+                            $("#ddlResult").html(option);
+                            $("#txtResult").hide();
+                            var selectedResult = $("#Result").val().split(',');
+                            for (var i = 0; i < selectedResult.length; i++) {
+                                $("#ddlResult").find('option[value="' + selectedResult[i] + '"]').prop("selected", true);
+                                $("input[value=" + selectedResult[i] + "]").prop('checked', 'checked');
+                            }
+                            $("#ddlResult").multiselect('rebuild');
+
+                            $('#ddlResult').attr('style', 'display:none !important');
+                            $('.result-group').find('.multiselect').css('display', 'block');
+                        } else {
+
+                            $("#txtResult").show();
+                            $("#txtResult").val($("#Result").val());
+                            $('.result-group').find('.multiselect').css('display', 'none');
+                            $('#ddlResult').attr('style', 'display:none !important');
+                        }
+                        $("#Result").val('');
+                        $("#Action").val('');
+                    }
+                }
+            });
+        }
+    });
+
+    $("#ddlHazard").on("change", function () {
+        if ($(this).val().length > 0) {
+            $(".hazrad-valid").css('display', 'none');
+            $("#ddlMaterial option:first").text('Select Material');
+            $("#ddlMaterial").removeAttr('disabled');
+            $("#ddlType option:first").text('Select Type');
+            $("#ddlType").removeAttr('disabled');
+        } else {
+            $("#ddlResult").html('');
+            $("#ddlResult").multiselect('rebuild');
+            $("#ddlAction").html('');
+            $("#ddlAction").multiselect('rebuild');
+            $("#ddlMaterial option:first").text('Please Select Hazard First');
+            $("#ddlMaterial").attr('disabled', 'disabled');
+            $("#ddlType option:first").text('Please Select Hazard First');
+            $("#ddlType").attr('disabled', 'disabled');
+
+            $(".multiselect-container.dropdown-menu").html('');
+        }
+
+        var siteid = $("#SiteId").val();
+        if ($(this).val() != "") {
+            var selectedHazard = $(this).find("option:selected").text();
+            var hazardId = $(this).val();
+            $.ajax({
+                url: "/Hazmat/GetDropDown",
+                type: "GET",
+                data: { hazardId: hazardId },
+
+                success: function (result) {
+
+                    if (result.ok) {
+                        var material = result.result.material;
+                        var type = result.result.type;
+                        var res = result.result.result;
+                        var action = result.result.action;
+                        var option = "";
+                        $.each(material, function (obj, val) {
+                            option += "<option value=" + val.MaterialId + ">" + val.Name + "</option>";
+                        });
+                        $("#ddlMaterial").html('<option selected="selected" value="">Select Material</option>' + option);
+                        option = "";
+                        $.each(type, function (obj, val) {
+                            option += "<option value=" + val.TypeId + ">" + val.Name + "</option>";
+                        });
+                        $("#ddlType").html('<option selected="selected" value="">Select Type</option>' + option);
+                        option = "";
+                        $.each(action, function (obj, val) {
+                            option += "<option value=" + val.ActionId + ">" + val.Name + "</option>";
+                        });
+                        $("#ddlAction").html(option);
+                        $("#ddlAction").attr('style', 'display:none !important');
+                        $("#ddlAction").multiselect('rebuild');
+                        $("#ddlAction").multiselect({ buttonWidth: '400px' });
+                        if (selectedHazard == "ASBESTOS") {
+                            option = "";
+                            $.each(res, function (obj, val) {
+                                option += "<option value=" + val.ResultId + ">" + val.Name + "</option>";
+                            });
+                            $("#ddlResult").html(option);
+                            $("#txtResult").hide();
+                            $("#ddlResult").multiselect('rebuild');
+                            $("#ddlResult").multiselect({ buttonWidth: '400px' });
+                            $('#ddlResult').attr('style', 'display:none !important');
+                            $('.result-group').find('.btn-group').css('display', 'inline-block');
+                            $('.result-group').find('button').css('display', 'block');
+                        }
+                        else {
+                            $("#txtResult").show();
+                            $('.result-group').find('.btn-group').css('display', 'none');
+                            $('#ddlResult').attr('style', 'display:none !important');
+                        }
+                    }
+                },
+                error: function (error) {
+
+                }
+
+            });
+        }
+    });
+
+    $("#ddlType").on("change", function () {
+        if ($(this).val().length > 0) {
+            $(".type-valid").css('display', 'none');
+        }
+    });
+
+    $("#ddlMaterial").on("change", function () {
+        if ($(this).val().length > 0) {
+            $(".material-valid").css('display', 'none');
+        }
+    });
+
+    $("#SampleId").keyup(function () {
+        if ($(this).val() !== "") {
+            $(".sampleId-valid").css('display', 'none');
+        }
+    });
+
+    $("#save-btn").on('click', function () {
+
+        $('.site-id').val($("#SiteId").val());
+        if ($("#ddlHazard").find('option:selected').text() === "ASBESTOS") {
+            var selectedResult = $("#ddlResult").find('option:selected');
+            $.each(selectedResult, function (i, val) {
+                $("#Result").val($("#Result").val() + $(val).val() + ",");
+            });
+        }
+        else if ($("#ddlHazard").find('option:selected').text() === "LEAD") {
+            $("#Result").val($("#txtResult").val());
+        }
+        var selectedAction = $("#ddlAction").find('option:selected');
+        $.each(selectedAction, function (i, val) {
+            $("#Action").val($("#Action").val() + $(val).val() + ",");
+        });
+        if (!($("#ddlHazard").val().length > 0)) {
+            $(".hazrad-valid").show();
+            return false;
+        }
+        if ($("form#frmSiteDetail .field-validation-valid").hasClass("invalid-file")) {
+            return false;
+        }
+        if (!($("#ddlMaterial").val().length > 0)) {
+            $(".material-valid").show();
+            return false;
+        }
+        if (($("#SampleId").val() == "")) {
+            $(".sampleId-valid").show();
+            return false;
+        }
+        if (!($("#ddlType").val().length > 0)) {
+            $(".type-valid").show();
+            return false;
+        }
+        var form = $("form#frmSiteDetail");
+        form.validate();
+        var url = $(form).attr('action');
+
+        if ($("form#frmSiteDetail").valid()) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function (result) {
+
+
+                    /**/
+                    //sited - detail - photo - path
+                    /**/
+                    if (result.ok) {
+                        var sitedetailPhotot = result.siteDetailPhoto;
+
+                        var resultVal = $("#Result").val();
+                        if ($("#ddlHazard").find('option:selected').text() == "ASBESTOS") {
+                            resultVal = "";
+                            $("#ddlResult").find('option:selected').each(function () {
+                                resultVal += $(this).text() + ",";
+                            });
+                            resultVal = resultVal.slice(0, -1);
+                        }
+
+                        if ($("#action").val() === "addSiteDetail") {
+                            var tableee = $("#appendix-b-datatable").DataTable().row.add([//$("#Level").val(),
+                                $("#Location").val(),
+                                $("#ddlHazard").find('option:selected').text(),
+                                $("#ddlMaterial").find('option:selected').text(),
+                                $("#SampleId").val(),
+                                //'20/04/2016',
+                                $("#M2").val(),
+                                $("#ddlType").find('option:selected').text(),
+                                $("#Condition").find('option:selected').text(),
+                                $("#RiskOfExposure").find('option:selected').text(),
+                                resultVal,
+                                $("#OverallRisk").find('option:selected').text(),
+                                //$("#Action").val(),
+                                //$("#ActionTimeframe").find('option:selected').text(),
+                                $("#Comments").val(),
+                                (sitedetailPhotot !== "" && sitedetailPhotot != undefined) ? '<div class="bulding-img"><img src="' + $("#sited-detail-photo-path").val() + '/' + sitedetailPhotot + '"></div>' : "",
+                                '<div class="other-action"><div class="edit-icon"><a class="edit-site-detail" href="/Hazmat/EditSiteDetail/' + result.siteDetailId.trim() + '"></a></div><div class="delete-icon"><a class="delete-site-detail" href="/Hazmat/DeleteSiteDetail/' + result.siteDetailId + '"></a></div></div>'
+                            ]).draw();
+                        }
+                        else if ($("#action").val() === "editSiteDetail") {
+
+                            var selectedRow = $("#selected-row").val();
+                            if (selectedRow != undefined && selectedRow !== -1) {
+                                var tr = $("#appendix-b-datatable tbody tr").eq(selectedRow);
+                                $(tr).find('td').eq(0).text($("#Location").val());
+                                $(tr).find('td').eq(1).text($("#ddlHazard").find('option:selected').text());
+                                $(tr).find('td').eq(2).text($("#ddlMaterial").find('option:selected').text());
+                                $(tr).find('td').eq(3).text($("#SampleId").val());
+                                $(tr).find('td').eq(4).text($("#M2").val());
+                                $(tr).find('td').eq(5).text($("#ddlType").find('option:selected').text());
+                                $(tr).find('td').eq(6).text($("#Condition").find('option:selected').text());
+                                $(tr).find('td').eq(7).text($("#RiskOfExposure").find('option:selected').text());
+                                $(tr).find('td').eq(8).text(resultVal);
+                                $(tr).find('td').eq(9).text($("#OverallRisk").find('option:selected').text());
+                                $(tr).find('td').eq(10).text($("#Comments").val());
+                                $(tr).find('td').eq(11).html((sitedetailPhotot !== "" && sitedetailPhotot != undefined) ? '<div class="bulding-img"><img src="' + $("#sited-detail-photo-path").val() + '/' + sitedetailPhotot + '"></div>' : $(tr).find('td').eq(11).html());
+                                $(tr).find('td').eq(12).html($(tr).find('td').eq(12).html());
+                            }
+                        }
+                        $("#Result").val('');
+                        $("#Action").val('');
+
+                        $("#static").html('');
+                        $('#static').modal('hide');
+                        var model = result.model;
+                        bootstrap_alert.success(result.message);
+                    } else {
+                        bootstrap_alert.danger(result.message);
+                    }
+                    alertTimeout(5000);
+                }
+            });
+        }
+    });
+
+    $(document).on("click", "#close-modal", function () {
+        $("#static").html('');
+        $('#static').modal('hide');
+    });
+
+    $("#update-site-detail").on('click', function () {
+        $('.site-id').val($("#SiteId").val());
+    });
+
+    var handleFileSelect = function (evt) {
+
+        var files = evt.target.files;
+        var file = files[0];
+
+        if (files && file) {
+            var reader = new FileReader();
+
+            reader.onload = function (readerEvt) {
+                var binaryString = readerEvt.target.result;
+                document.getElementById("Photo").value = btoa(binaryString);
+            };
+            reader.readAsBinaryString(file);
+        }
+    };
+
+    var handlePlanFileSelect = function (evt) {
+        var files = evt.target.files;
+        var file = files[0];
+
+        if (files && file) {
+            var reader = new FileReader();
+
+            reader.onload = function (readerEvt) {
+                var binaryString = readerEvt.target.result;
+                document.getElementById("Plan").value = btoa(binaryString);
+            };
+            reader.readAsBinaryString(file);
+        }
+    };
+
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        document.getElementById('sited-detail-photo').addEventListener('change', handleFileSelect, false);
+        document.getElementById('plan-photo').addEventListener('change', handlePlanFileSelect, false);
+
+    } else {
+        alert('The File APIs are not fully supported in this browser.');
+    }
+
+    function checkFileType(file) {
+        if (file != null) {
+            var extension = file.substr((file.lastIndexOf('.') + 1));
+            var flag = false;
+            switch (extension) {
+            case 'jpg':
+            case 'JPG':
+                flag = true;
+                break;
+            case 'png':
+            case 'PNG':
+
+                flag = true;
+                break;
+            case 'jpeg':
+            case 'JPEG':
+                flag = true;
+                break;
+            default:
+                flag = false;
+            }
+            return flag;
+        }
+    }
+
+    function checkFile(input) {
+        if (typeof (input.files[0]) !== 'undefined') {
+            var file = input.files[0].name;
+            if (checkFileType(file)) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#profile').attr('src', e.target.result);
+                        $("#deleteImage2").show();
+                        $("#existAlert").hide();
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+                $(input).parent().find('#type-validation').hide();
+                $(input).parent().find('#type-validation').removeClass('invalid-file');
+            } else {
+                //$("#site-detail-valid").show();
+                $(input).parent().find('#type-validation').show();
+                $(input).parent().find('#type-validation').addClass('invalid-file');
+            }
+        }
+    }
+
+    $("#plan-photo").on('change', function () {
+        checkFile(this);
+    });
+
+    $("#sited-detail-photo").on('change', function () {
+
+        checkFile(this);
+    });
+</script>
